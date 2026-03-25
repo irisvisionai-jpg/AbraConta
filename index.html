@@ -15,11 +15,10 @@
       --primary-dark: #16a34a;
       --input: #0b1220;
       --danger: #ef4444;
+      --warn: #f59e0b;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -30,14 +29,12 @@
     }
 
     .wrap {
-      max-width: 980px;
+      max-width: 1100px;
       margin: 0 auto;
       padding: 32px 20px 56px;
     }
 
-    .header {
-      margin-bottom: 24px;
-    }
+    .header { margin-bottom: 24px; }
 
     .badge {
       display: inline-block;
@@ -60,7 +57,7 @@
       margin: 0;
       color: var(--muted);
       line-height: 1.6;
-      max-width: 720px;
+      max-width: 820px;
     }
 
     .card {
@@ -71,22 +68,9 @@
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28);
     }
 
-    .grid {
-      display: grid;
-      gap: 16px;
-    }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    .grid-3 {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 16px;
-    }
+    .grid { display: grid; gap: 16px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
 
     label {
       display: block;
@@ -100,7 +84,7 @@
       color: #86efac;
     }
 
-    input {
+    input, select {
       width: 100%;
       height: 48px;
       border-radius: 14px;
@@ -112,7 +96,7 @@
       outline: none;
     }
 
-    input:focus {
+    input:focus, select:focus {
       border-color: #22c55e;
       box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.14);
     }
@@ -142,6 +126,20 @@
       background: #111827;
       color: #e2e8f0;
       border: 1px solid #334155;
+    }
+
+    .panel {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .panel.warn {
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: #fde68a;
     }
 
     .preview {
@@ -194,15 +192,15 @@
       font-size: 13px;
     }
 
-    @media (max-width: 820px) {
-      .grid-2,
-      .grid-3 {
-        grid-template-columns: 1fr;
-      }
+    .section-title {
+      margin: 8px 0 0;
+      font-size: 16px;
+      color: #e2e8f0;
+    }
 
-      h1 {
-        font-size: 28px;
-      }
+    @media (max-width: 820px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      h1 { font-size: 28px; }
     }
   </style>
 </head>
@@ -212,17 +210,38 @@
       <div class="badge">AbraConta • Validação do Fluxo 1</div>
       <h1>Cadastro inicial do cliente</h1>
       <p class="sub">
-        Este front é para captar os dados mínimos do cliente e enviar ao webhook do n8n,
-        permitindo validar a criação no banco de dados e no Asaas.
+        Este front envia os dados no formato exato esperado pelo fluxo 1 do n8n.
+        Ele já monta o payload compatível com a criação do cliente no banco e no Asaas.
       </p>
     </div>
 
     <div class="card">
+      <div class="panel warn">
+        <strong>Antes de testar:</strong><br>
+        1. No n8n, use a URL de <strong>teste</strong> se o workflow estiver em execução manual, ou a URL de <strong>produção</strong> se ele estiver ativo.<br>
+        2. No Webhook node, deixe <strong>Allowed Origins (CORS)</strong> como <strong>*</strong> ou inclua o domínio do seu HTML.<br>
+        3. O fluxo 1 exige também dados de pagamento, então este HTML já envia esses campos junto.
+      </div>
+
       <form id="customerForm" class="grid">
+        <div class="grid-2">
+          <div>
+            <label class="req" for="webhookUrl">Webhook do n8n</label>
+            <input id="webhookUrl" name="webhookUrl" type="url" placeholder="https://seu-n8n/webhook-test/abraconta/checkout/criar-cobranca" required />
+            <div class="hint">Ex.: teste: /webhook-test/... | produção: /webhook/...</div>
+          </div>
+          <div>
+            <label for="billingType">Forma de cobrança</label>
+            <select id="billingType" name="billingType">
+              <option value="BOLETO">BOLETO</option>
+              <option value="PIX">PIX</option>
+              <option value="CREDIT_CARD">CREDIT_CARD</option>
+            </select>
+          </div>
+        </div>
+
         <div>
-          <label class="req" for="webhookUrl">Webhook do n8n</label>
-          <input id="webhookUrl" name="webhookUrl" type="url" placeholder="https://n8n.srv1000189.hstgr.cloud/webhook-test/abraconta/checkout/criar-cobranca" required />
-          <div class="hint">Preencha a URL do webhook de teste para enviar os dados diretamente ao fluxo 1.</div>
+          <div class="section-title">Dados do cliente</div>
         </div>
 
         <div class="grid-2">
@@ -246,9 +265,13 @@
             <input id="phone" name="phone" type="text" placeholder="(11) 3333-3333" />
           </div>
           <div>
-            <label for="mobilePhone">Celular</label>
+            <label class="req" for="mobilePhone">Celular</label>
             <input id="mobilePhone" name="mobilePhone" type="text" placeholder="(11) 99999-9999" />
           </div>
+        </div>
+
+        <div>
+          <div class="section-title">Endereço</div>
         </div>
 
         <div class="grid-3">
@@ -277,6 +300,40 @@
           </div>
         </div>
 
+        <div>
+          <div class="section-title">Dados mínimos para testar o fluxo 1</div>
+        </div>
+
+        <div class="grid-3">
+          <div>
+            <label class="req" for="valor_total">Valor total</label>
+            <input id="valor_total" name="valor_total" type="number" step="0.01" placeholder="1500.00" required />
+          </div>
+          <div>
+            <label class="req" for="dueDate">Data de vencimento</label>
+            <input id="dueDate" name="dueDate" type="date" required />
+          </div>
+          <div>
+            <label for="tipo_plano">Tipo de plano</label>
+            <input id="tipo_plano" name="tipo_plano" type="text" placeholder="Abertura de Empresa" />
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <div>
+            <label class="req" for="installmentCount">Qtd. parcelas</label>
+            <input id="installmentCount" name="installmentCount" type="number" min="1" value="12" required />
+          </div>
+          <div>
+            <label class="req" for="installmentValue">Valor da parcela</label>
+            <input id="installmentValue" name="installmentValue" type="number" step="0.01" placeholder="125.00" required />
+          </div>
+          <div>
+            <label for="description">Descrição</label>
+            <input id="description" name="description" type="text" placeholder="Plano Abraconta" />
+          </div>
+        </div>
+
         <div class="actions">
           <button type="button" class="btn-secondary" id="fillExample">Preencher exemplo</button>
           <button type="button" class="btn-secondary" id="generateJson">Gerar JSON</button>
@@ -288,18 +345,7 @@
 
       <div class="preview">
         <h2>Prévia do payload</h2>
-        <pre id="payloadPreview">{
-  "name": "",
-  "cpfCnpj": "",
-  "email": "",
-  "phone": "",
-  "mobilePhone": "",
-  "address": "",
-  "addressNumber": "",
-  "complement": "",
-  "province": "",
-  "postalCode": ""
-}</pre>
+        <pre id="payloadPreview">{}</pre>
       </div>
     </div>
   </div>
@@ -310,16 +356,8 @@
     const feedback = document.getElementById('feedback');
 
     const fields = [
-      'name',
-      'cpfCnpj',
-      'email',
-      'phone',
-      'mobilePhone',
-      'address',
-      'addressNumber',
-      'complement',
-      'province',
-      'postalCode'
+      'name','cpfCnpj','email','phone','mobilePhone','address','addressNumber','complement','province','postalCode',
+      'valor_total','dueDate','installmentCount','installmentValue','description','billingType','tipo_plano'
     ];
 
     function onlyDigits(value) {
@@ -344,13 +382,9 @@
     function maskPhone(value) {
       const digits = onlyDigits(value).slice(0, 11);
       if (digits.length <= 10) {
-        return digits
-          .replace(/(\d{2})(\d)/, '($1) $2')
-          .replace(/(\d{4})(\d)/, '$1-$2');
+        return digits.replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{4})(\d)/, '$1-$2');
       }
-      return digits
-        .replace(/(\d{2})(\d)/, '($1) $2')
-        .replace(/(\d{5})(\d)/, '$1-$2');
+      return digits.replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{5})(\d)/, '$1-$2');
     }
 
     function maskCep(value) {
@@ -358,22 +392,35 @@
     }
 
     function getPayload() {
+      const rawCpfCnpj = onlyDigits(document.getElementById('cpfCnpj').value);
+      const isCpf = rawCpfCnpj.length <= 11;
+
       return {
-        name: document.getElementById('name').value.trim(),
-        cpfCnpj: onlyDigits(document.getElementById('cpfCnpj').value),
+        nome_completo: document.getElementById('name').value.trim(),
+        cpf: isCpf ? rawCpfCnpj : '',
+        cpfCnpj: rawCpfCnpj,
         email: document.getElementById('email').value.trim(),
+        telefone_whatsapp: onlyDigits(document.getElementById('mobilePhone').value),
         phone: onlyDigits(document.getElementById('phone').value),
         mobilePhone: onlyDigits(document.getElementById('mobilePhone').value),
         address: document.getElementById('address').value.trim(),
         addressNumber: document.getElementById('addressNumber').value.trim(),
         complement: document.getElementById('complement').value.trim(),
         province: document.getElementById('province').value.trim(),
-        postalCode: onlyDigits(document.getElementById('postalCode').value)
+        postalCode: onlyDigits(document.getElementById('postalCode').value),
+        valor_total: Number(document.getElementById('valor_total').value || 0),
+        dueDate: document.getElementById('dueDate').value,
+        installmentCount: Number(document.getElementById('installmentCount').value || 0),
+        installmentValue: Number(document.getElementById('installmentValue').value || 0),
+        description: document.getElementById('description').value.trim() || 'Plano Abraconta',
+        billingType: document.getElementById('billingType').value,
+        tipo_plano: document.getElementById('tipo_plano').value.trim() || 'Abertura de Empresa'
       };
     }
 
-    function updatePreview() {
-      preview.textContent = JSON.stringify(getPayload(), null, 2);
+    function updatePreview(extra = null) {
+      const data = extra || getPayload();
+      preview.textContent = JSON.stringify(data, null, 2);
     }
 
     function setFeedback(message, type) {
@@ -403,8 +450,9 @@
 
     fields.forEach((id) => {
       const el = document.getElementById(id);
-      el.addEventListener('input', updatePreview);
-      el.addEventListener('blur', updatePreview);
+      if (!el) return;
+      el.addEventListener('input', () => updatePreview());
+      el.addEventListener('change', () => updatePreview());
     });
 
     document.getElementById('fillExample').addEventListener('click', () => {
@@ -418,6 +466,15 @@
       document.getElementById('complement').value = 'Sala 01';
       document.getElementById('province').value = 'Cidade Monções';
       document.getElementById('postalCode').value = '04576-080';
+      document.getElementById('valor_total').value = '1500';
+      document.getElementById('installmentCount').value = '12';
+      document.getElementById('installmentValue').value = '125';
+      document.getElementById('description').value = 'Plano Abraconta';
+      document.getElementById('tipo_plano').value = 'Abertura de Empresa';
+      document.getElementById('billingType').value = 'BOLETO';
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      document.getElementById('dueDate').value = tomorrow.toISOString().split('T')[0];
       updatePreview();
       setFeedback('Exemplo preenchido para acelerar sua validação.', 'ok');
     });
@@ -432,8 +489,8 @@
       const webhookUrl = document.getElementById('webhookUrl').value.trim();
       const payload = getPayload();
 
-      if (!payload.name || !payload.cpfCnpj) {
-        setFeedback('Nome e CPF/CNPJ são obrigatórios para a validação do fluxo.', 'error');
+      if (!payload.nome_completo || !payload.cpfCnpj || !payload.telefone_whatsapp || !payload.valor_total || !payload.dueDate) {
+        setFeedback('Preencha nome, CPF/CNPJ, celular, valor total e vencimento.', 'error');
         return;
       }
 
@@ -443,32 +500,30 @@
         const response = await fetch(webhookUrl, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
           },
           body: JSON.stringify(payload)
         });
 
         const text = await response.text();
         let parsed;
-
         try {
           parsed = JSON.parse(text);
         } catch {
           parsed = text;
         }
 
-        preview.textContent = JSON.stringify({
-          payload_enviado: payload,
-          resposta_n8n: parsed
-        }, null, 2);
+        updatePreview({ payload_enviado: payload, resposta_n8n: parsed, status_http: response.status });
 
         if (!response.ok) {
-          setFeedback(`Webhook respondeu com erro (${response.status}). Confira a prévia abaixo.`, 'error');
+          setFeedback(`Webhook respondeu com erro (${response.status}). Confira a resposta na prévia abaixo.`, 'error');
           return;
         }
 
         setFeedback('Dados enviados com sucesso para o n8n.', 'ok');
       } catch (error) {
+        updatePreview({ payload_enviado: payload, erro: error.message });
         setFeedback(`Falha ao enviar para o webhook: ${error.message}`, 'error');
       }
     });
