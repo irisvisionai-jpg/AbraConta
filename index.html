@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AbraConta | Cadastro Inicial</title>
+  <style>
+    :root {
+      --bg: #08111f;
+      --card: #0f172a;
+      --stroke: #1e293b;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --primary: #22c55e;
+      --primary-dark: #16a34a;
+      --input: #0b1220;
+      --danger: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg, #020617, #0f172a);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 32px 20px 56px;
+    }
+
+    .header {
+      margin-bottom: 24px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(34, 197, 94, 0.12);
+      border: 1px solid rgba(34, 197, 94, 0.28);
+      color: #bbf7d0;
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: 34px;
+      line-height: 1.1;
+    }
+
+    .sub {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 720px;
+    }
+
+    .card {
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid var(--stroke);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28);
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #cbd5e1;
+    }
+
+    .req::after {
+      content: " *";
+      color: #86efac;
+    }
+
+    input {
+      width: 100%;
+      height: 48px;
+      border-radius: 14px;
+      border: 1px solid #334155;
+      background: var(--input);
+      color: var(--text);
+      padding: 0 14px;
+      font-size: 15px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #22c55e;
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.14);
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: none;
+      border-radius: 14px;
+      padding: 14px 18px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+      color: #052e16;
+    }
+
+    .btn-secondary {
+      background: #111827;
+      color: #e2e8f0;
+      border: 1px solid #334155;
+    }
+
+    .preview {
+      margin-top: 24px;
+      background: #07101d;
+      border: 1px solid #223047;
+      border-radius: 18px;
+      padding: 18px;
+    }
+
+    .preview h2 {
+      margin: 0 0 12px;
+      font-size: 18px;
+    }
+
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: #cbd5e1;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .msg {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      display: none;
+      font-size: 14px;
+    }
+
+    .msg.ok {
+      display: block;
+      background: rgba(34, 197, 94, 0.12);
+      border: 1px solid rgba(34, 197, 94, 0.25);
+      color: #bbf7d0;
+    }
+
+    .msg.error {
+      display: block;
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      color: #fecaca;
+    }
+
+    .hint {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 820px) {
+      .grid-2,
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="header">
+      <div class="badge">AbraConta • Validação do Fluxo 1</div>
+      <h1>Cadastro inicial do cliente</h1>
+      <p class="sub">
+        Este front é para captar os dados mínimos do cliente e enviar ao webhook do n8n,
+        permitindo validar a criação no banco de dados e no Asaas.
+      </p>
+    </div>
+
+    <div class="card">
+      <form id="customerForm" class="grid">
+        <div>
+          <label class="req" for="webhookUrl">Webhook do n8n</label>
+          <input id="webhookUrl" name="webhookUrl" type="url" placeholder="https://seu-n8n/webhook/abraconta/checkout/criar-cobranca" required />
+          <div class="hint">Preencha a URL do webhook de teste para enviar os dados diretamente ao fluxo 1.</div>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <label class="req" for="name">Nome do cliente</label>
+            <input id="name" name="name" type="text" placeholder="Nome completo ou razão social" required />
+          </div>
+          <div>
+            <label class="req" for="cpfCnpj">CPF ou CNPJ</label>
+            <input id="cpfCnpj" name="cpfCnpj" type="text" placeholder="000.000.000-00 ou 00.000.000/0000-00" required />
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <div>
+            <label for="email">E-mail</label>
+            <input id="email" name="email" type="email" placeholder="cliente@exemplo.com" />
+          </div>
+          <div>
+            <label for="phone">Telefone fixo</label>
+            <input id="phone" name="phone" type="text" placeholder="(11) 3333-3333" />
+          </div>
+          <div>
+            <label for="mobilePhone">Celular</label>
+            <input id="mobilePhone" name="mobilePhone" type="text" placeholder="(11) 99999-9999" />
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <div>
+            <label for="postalCode">CEP</label>
+            <input id="postalCode" name="postalCode" type="text" placeholder="00000-000" />
+          </div>
+          <div>
+            <label for="addressNumber">Número</label>
+            <input id="addressNumber" name="addressNumber" type="text" placeholder="123" />
+          </div>
+          <div>
+            <label for="complement">Complemento</label>
+            <input id="complement" name="complement" type="text" placeholder="Sala, conjunto, apto" maxlength="255" />
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <label for="address">Logradouro</label>
+            <input id="address" name="address" type="text" placeholder="Rua, avenida, alameda" />
+          </div>
+          <div>
+            <label for="province">Bairro</label>
+            <input id="province" name="province" type="text" placeholder="Bairro" />
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="button" class="btn-secondary" id="fillExample">Preencher exemplo</button>
+          <button type="button" class="btn-secondary" id="generateJson">Gerar JSON</button>
+          <button type="submit" class="btn-primary">Enviar para o n8n</button>
+        </div>
+      </form>
+
+      <div id="feedback" class="msg"></div>
+
+      <div class="preview">
+        <h2>Prévia do payload</h2>
+        <pre id="payloadPreview">{
+  "name": "",
+  "cpfCnpj": "",
+  "email": "",
+  "phone": "",
+  "mobilePhone": "",
+  "address": "",
+  "addressNumber": "",
+  "complement": "",
+  "province": "",
+  "postalCode": ""
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('customerForm');
+    const preview = document.getElementById('payloadPreview');
+    const feedback = document.getElementById('feedback');
+
+    const fields = [
+      'name',
+      'cpfCnpj',
+      'email',
+      'phone',
+      'mobilePhone',
+      'address',
+      'addressNumber',
+      'complement',
+      'province',
+      'postalCode'
+    ];
+
+    function onlyDigits(value) {
+      return String(value || '').replace(/\D/g, '');
+    }
+
+    function maskCpfCnpj(value) {
+      const digits = onlyDigits(value).slice(0, 14);
+      if (digits.length <= 11) {
+        return digits
+          .replace(/(\d{3})(\d)/, '$1.$2')
+          .replace(/(\d{3})(\d)/, '$1.$2')
+          .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+      }
+      return digits
+        .replace(/(\d{2})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d)/, '$1/$2')
+        .replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+    }
+
+    function maskPhone(value) {
+      const digits = onlyDigits(value).slice(0, 11);
+      if (digits.length <= 10) {
+        return digits
+          .replace(/(\d{2})(\d)/, '($1) $2')
+          .replace(/(\d{4})(\d)/, '$1-$2');
+      }
+      return digits
+        .replace(/(\d{2})(\d)/, '($1) $2')
+        .replace(/(\d{5})(\d)/, '$1-$2');
+    }
+
+    function maskCep(value) {
+      return onlyDigits(value).slice(0, 8).replace(/(\d{5})(\d)/, '$1-$2');
+    }
+
+    function getPayload() {
+      return {
+        name: document.getElementById('name').value.trim(),
+        cpfCnpj: onlyDigits(document.getElementById('cpfCnpj').value),
+        email: document.getElementById('email').value.trim(),
+        phone: onlyDigits(document.getElementById('phone').value),
+        mobilePhone: onlyDigits(document.getElementById('mobilePhone').value),
+        address: document.getElementById('address').value.trim(),
+        addressNumber: document.getElementById('addressNumber').value.trim(),
+        complement: document.getElementById('complement').value.trim(),
+        province: document.getElementById('province').value.trim(),
+        postalCode: onlyDigits(document.getElementById('postalCode').value)
+      };
+    }
+
+    function updatePreview() {
+      preview.textContent = JSON.stringify(getPayload(), null, 2);
+    }
+
+    function setFeedback(message, type) {
+      feedback.className = `msg ${type}`;
+      feedback.textContent = message;
+    }
+
+    document.getElementById('cpfCnpj').addEventListener('input', (e) => {
+      e.target.value = maskCpfCnpj(e.target.value);
+      updatePreview();
+    });
+
+    document.getElementById('phone').addEventListener('input', (e) => {
+      e.target.value = maskPhone(e.target.value);
+      updatePreview();
+    });
+
+    document.getElementById('mobilePhone').addEventListener('input', (e) => {
+      e.target.value = maskPhone(e.target.value);
+      updatePreview();
+    });
+
+    document.getElementById('postalCode').addEventListener('input', (e) => {
+      e.target.value = maskCep(e.target.value);
+      updatePreview();
+    });
+
+    fields.forEach((id) => {
+      const el = document.getElementById(id);
+      el.addEventListener('input', updatePreview);
+      el.addEventListener('blur', updatePreview);
+    });
+
+    document.getElementById('fillExample').addEventListener('click', () => {
+      document.getElementById('name').value = 'Ana Carolina Silvino Silva';
+      document.getElementById('cpfCnpj').value = '123.456.789-01';
+      document.getElementById('email').value = 'ana.teste@abraconta.com';
+      document.getElementById('phone').value = '(11) 3333-9412';
+      document.getElementById('mobilePhone').value = '(11) 96446-4906';
+      document.getElementById('address').value = 'Rua James Joule';
+      document.getElementById('addressNumber').value = '92';
+      document.getElementById('complement').value = 'Sala 01';
+      document.getElementById('province').value = 'Cidade Monções';
+      document.getElementById('postalCode').value = '04576-080';
+      updatePreview();
+      setFeedback('Exemplo preenchido para acelerar sua validação.', 'ok');
+    });
+
+    document.getElementById('generateJson').addEventListener('click', () => {
+      updatePreview();
+      setFeedback('JSON gerado com sucesso. Você já pode copiar da prévia.', 'ok');
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const webhookUrl = document.getElementById('webhookUrl').value.trim();
+      const payload = getPayload();
+
+      if (!payload.name || !payload.cpfCnpj) {
+        setFeedback('Nome e CPF/CNPJ são obrigatórios para a validação do fluxo.', 'error');
+        return;
+      }
+
+      try {
+        setFeedback('Enviando dados para o webhook...', 'ok');
+
+        const response = await fetch(webhookUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const text = await response.text();
+        let parsed;
+
+        try {
+          parsed = JSON.parse(text);
+        } catch {
+          parsed = text;
+        }
+
+        preview.textContent = JSON.stringify({
+          payload_enviado: payload,
+          resposta_n8n: parsed
+        }, null, 2);
+
+        if (!response.ok) {
+          setFeedback(`Webhook respondeu com erro (${response.status}). Confira a prévia abaixo.`, 'error');
+          return;
+        }
+
+        setFeedback('Dados enviados com sucesso para o n8n.', 'ok');
+      } catch (error) {
+        setFeedback(`Falha ao enviar para o webhook: ${error.message}`, 'error');
+      }
+    });
+
+    updatePreview();
+  </script>
+</body>
+</html>
